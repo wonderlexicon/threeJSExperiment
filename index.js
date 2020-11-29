@@ -7,14 +7,15 @@ import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threej
 
 function main(){
     let canvas = document.querySelector("#canvas");
+
     let renderer = new THREE.WebGLRenderer({canvas});  
     //the number of angles in between left and right
     let fieldOfVisionDegrees = 75;
     //the ratio of ratio of width to height
-    let aspectRatio = 2.3;
+    let aspectRatio = 4.3;
     //degree of perceived close up perspective (ND >FD see more dimension of depth)
     let nearDistance = 0.1;
-    let farDistance = 3.5;
+    let farDistance = 5;
     let camera = new THREE.PerspectiveCamera(
         fieldOfVisionDegrees,
         aspectRatio,
@@ -57,15 +58,44 @@ function main(){
 
     let cube = new THREE.Mesh(boxGeometry, boxMaterial);
     scene.add(cube);
+
+
+    function resizeRenderer(renderer){
+        let canvas = renderer.domElement;
+        let needsResizing = (
+            canvas.width != canvas.clientWidth || 
+            canvas.height != canvas.clientHeight 
+        )
+        if (needsResizing){
+            renderer.setSize(
+                canvas.clientWidth, 
+                canvas.clientHeight, 
+                false
+                );
+        }
+        return needsResizing;
+    }
+
+
+
     function render(timeStamp){
         timeStamp = timeStamp * 0.001;
+        if (resizeRenderer(renderer)){
+            let canvas = renderer.domElement;
+            camera.aspect = canvas.clientWidth/canvas.clientHeight;
+            camera.updateProjectionMatrix();
+        }
+       
+        
         cube.rotation.x = timeStamp;
         cube.rotation.y = timeStamp;
         renderer.render(scene, camera);
         requestAnimationFrame(render);
     
     }
+
   requestAnimationFrame(render);
 }
+
 
 main();
